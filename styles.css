@@ -154,17 +154,18 @@ output.visible {
 }
 .copy-btn {
   position: absolute;
-  top: 0.4rem;
-  right: 0.4rem;
+  top: 0.5rem;
+  right: 0.5rem;
   padding: 0.25rem 0.6rem;
+  margin-top: 0;
   font-size: 0.75rem;
   border-radius: 999px;
   border: 1px solid #2563eb55;
   background: #2563eb22;
   color: inherit;
   cursor: pointer;
-  margin-top: 0;
   width: auto;
+  z-index: 1;
 }
 .copy-btn:active {
   transform: scale(0.98);
