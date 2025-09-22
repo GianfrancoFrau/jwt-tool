@@ -60,6 +60,7 @@ window.addEventListener("load", () => {
   const encodePayloadInput = document.getElementById("encode-payload");
   const encodeBtn = document.getElementById("encode-btn");
   const encodeResetBtn = document.getElementById("encode-reset-btn");
+  const encodeResults = document.getElementById("encode-results");
   const encodeOutput = document.getElementById("encode-output");
   const encodeOutputBlock = document.getElementById("encode-output-block");
   const encodeError = document.getElementById("encode-error");
@@ -78,6 +79,7 @@ window.addEventListener("load", () => {
     encodeOutput.textContent = "";
     encodeOutput.classList.remove("visible");
     encodeOutputBlock.hidden = true;
+    encodeResults.hidden = true;
     updateEncodeResetState();
   };
 
@@ -92,11 +94,13 @@ window.addEventListener("load", () => {
     encodeOutput.textContent = "";
     encodeOutput.classList.remove("visible");
     encodeOutputBlock.hidden = true;
+    encodeResults.hidden = true;
     const secret = encodeSecretInput.value.trim();
     const payloadText = encodePayloadInput.value.trim();
     if (!secret) {
       encodeError.textContent = "Secret is required";
       encodeError.hidden = false;
+      encodeResults.hidden = false;
       return;
     }
     try {
@@ -105,6 +109,7 @@ window.addEventListener("load", () => {
       encodeOutput.textContent = token;
       encodeOutput.classList.add("visible");
       encodeOutputBlock.hidden = false;
+      encodeResults.hidden = false;
     } catch (err) {
       if (err instanceof SyntaxError) {
         encodeError.textContent = "Invalid payload: ensure it is valid JSON";
@@ -113,6 +118,7 @@ window.addEventListener("load", () => {
         console.error("Token generation failed", err);
       }
       encodeError.hidden = false;
+      encodeResults.hidden = false;
     }
   });
 

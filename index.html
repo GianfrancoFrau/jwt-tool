@@ -56,17 +56,20 @@
               <button id="encode-reset-btn" type="button" disabled>Reset</button>
               <button id="encode-btn" type="button">Generate token</button>
             </div>
-            <div id="encode-output-block" class="copy-block" hidden>
-              <output id="encode-output"></output>
-              <button
-                type="button"
-                class="copy-btn"
-                data-copy-target="encode-output"
-              >
-                Copy
-              </button>
+            <div id="encode-results" class="encode-results" hidden>
+              <strong>JWT Token</strong>
+              <div id="encode-output-block" class="copy-block" hidden>
+                <output id="encode-output"></output>
+                <button
+                  type="button"
+                  class="copy-btn"
+                  data-copy-target="encode-output"
+                >
+                  Copy
+                </button>
+              </div>
+              <div id="encode-error" class="error" hidden></div>
             </div>
-            <div id="encode-error" class="error" hidden></div>
           </fieldset>
         </section>
 
