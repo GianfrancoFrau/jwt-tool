@@ -59,9 +59,32 @@ window.addEventListener("load", () => {
   const encodeSecretInput = document.getElementById("encode-secret");
   const encodePayloadInput = document.getElementById("encode-payload");
   const encodeBtn = document.getElementById("encode-btn");
+  const encodeResetBtn = document.getElementById("encode-reset-btn");
   const encodeOutput = document.getElementById("encode-output");
   const encodeOutputBlock = document.getElementById("encode-output-block");
   const encodeError = document.getElementById("encode-error");
+
+  const updateEncodeResetState = () => {
+    const hasSecret = encodeSecretInput.value.trim().length > 0;
+    const hasPayload = encodePayloadInput.value.trim().length > 0;
+    encodeResetBtn.disabled = !(hasSecret || hasPayload);
+  };
+
+  const resetEncodeForm = () => {
+    encodeSecretInput.value = "";
+    encodePayloadInput.value = "";
+    encodeError.hidden = true;
+    encodeError.textContent = "";
+    encodeOutput.textContent = "";
+    encodeOutput.classList.remove("visible");
+    encodeOutputBlock.hidden = true;
+    updateEncodeResetState();
+  };
+
+  encodeSecretInput.addEventListener("input", updateEncodeResetState);
+  encodePayloadInput.addEventListener("input", updateEncodeResetState);
+  encodeResetBtn.addEventListener("click", resetEncodeForm);
+  updateEncodeResetState();
 
   encodeBtn.addEventListener("click", async () => {
     encodeError.hidden = true;
@@ -96,6 +119,7 @@ window.addEventListener("load", () => {
   const decodeTokenInput = document.getElementById("decode-token");
   const decodeSecretInput = document.getElementById("decode-secret");
   const decodeBtn = document.getElementById("decode-btn");
+  const decodeResetBtn = document.getElementById("decode-reset-btn");
   const decodedHeader = document.getElementById("decoded-header");
   const decodedPayload = document.getElementById("decoded-payload");
   const decodedValid = document.getElementById("decoded-valid");
@@ -117,6 +141,26 @@ window.addEventListener("load", () => {
     decodedValid.textContent = "";
     decodedValid.classList.remove("visible");
   };
+
+  const updateDecodeResetState = () => {
+    const hasToken = decodeTokenInput.value.trim().length > 0;
+    const hasSecret = decodeSecretInput.value.trim().length > 0;
+    decodeResetBtn.disabled = !(hasToken || hasSecret);
+  };
+
+  const resetDecodeForm = () => {
+    decodeTokenInput.value = "";
+    decodeSecretInput.value = "";
+    decodeError.hidden = true;
+    decodeError.textContent = "";
+    clearDecodeOutputs();
+    updateDecodeResetState();
+  };
+
+  decodeTokenInput.addEventListener("input", updateDecodeResetState);
+  decodeSecretInput.addEventListener("input", updateDecodeResetState);
+  decodeResetBtn.addEventListener("click", resetDecodeForm);
+  updateDecodeResetState();
 
   decodeBtn.addEventListener("click", async () => {
     decodeError.hidden = true;

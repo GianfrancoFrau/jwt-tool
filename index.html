@@ -52,7 +52,10 @@
               ></textarea>
             </div>
 
-            <button id="encode-btn" type="button">Generate token</button>
+            <div class="button-row">
+              <button id="encode-reset-btn" type="button" disabled>Reset</button>
+              <button id="encode-btn" type="button">Generate token</button>
+            </div>
             <div id="encode-output-block" class="copy-block" hidden>
               <output id="encode-output"></output>
               <button
@@ -87,7 +90,10 @@
               autocomplete="off"
             />
 
-            <button id="decode-btn" type="button">Decode</button>
+            <div class="button-row">
+              <button id="decode-reset-btn" type="button" disabled>Reset</button>
+              <button id="decode-btn" type="button">Decode</button>
+            </div>
             <div id="decode-results" class="decode-results" hidden>
               <div class="row two">
                 <div>

@@ -48,6 +48,15 @@ button {
   border: 1px solid #7775;
   box-sizing: border-box;
 }
+.button-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+.button-row button {
+  width: auto;
+  flex: 1;
+}
 textarea,
 input,
 output,
@@ -66,6 +75,10 @@ pre {
 button {
   cursor: pointer;
   margin-top: 0.25rem;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 .tab-bar {
   display: inline-flex;
