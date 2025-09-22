@@ -37,24 +37,9 @@ window.addEventListener("load", () => {
   };
 
   const readHashTab = () => window.location.hash.slice(1).toLowerCase();
-
   const defaultTab = tabButtons[0]?.dataset.tab ?? "encode";
   const initialHashTab = readHashTab();
   const initialTab = validTabs.has(initialHashTab) ? initialHashTab : defaultTab;
-  setActiveTab(initialTab, { updateHash: false });
-
-  tabButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      setActiveTab(button.dataset.tab);
-    });
-  });
-
-  window.addEventListener("hashchange", () => {
-    const hashTab = readHashTab();
-    if (validTabs.has(hashTab)) {
-      setActiveTab(hashTab, { updateHash: false });
-    }
-  });
 
   const encodeSecretInput = document.getElementById("encode-secret");
   const encodePayloadInput = document.getElementById("encode-payload");
@@ -84,47 +69,6 @@ window.addEventListener("load", () => {
     encodeResults.hidden = true;
     updateEncodeResetState();
   };
-
-  encodeSecretInput.addEventListener("input", updateEncodeResetState);
-  encodePayloadInput.addEventListener("input", updateEncodeResetState);
-  encodeResetBtn.addEventListener("click", resetEncodeForm);
-  updateEncodeResetState();
-
-  encodeBtn.addEventListener("click", async () => {
-    encodeError.hidden = true;
-    encodeError.textContent = "";
-    encodeOutput.textContent = "";
-    encodeOutput.classList.remove("visible");
-    encodeOutputBlock.hidden = true;
-    encodeOutputLabel.hidden = true;
-    encodeResults.hidden = true;
-    const secret = encodeSecretInput.value.trim();
-    const payloadText = encodePayloadInput.value.trim();
-    if (!secret) {
-      encodeError.textContent = "Secret is required";
-      encodeError.hidden = false;
-      encodeResults.hidden = false;
-      return;
-    }
-    try {
-      const payload = JSON.parse(payloadText || "{}");
-      const { token } = await createJwt({ payload, secret });
-      encodeOutput.textContent = token;
-      encodeOutput.classList.add("visible");
-      encodeOutputBlock.hidden = false;
-      encodeOutputLabel.hidden = false;
-      encodeResults.hidden = false;
-    } catch (err) {
-      if (err instanceof SyntaxError) {
-        encodeError.textContent = "Invalid payload: ensure it is valid JSON";
-      } else {
-        encodeError.textContent = "Error while generating the token";
-        console.error("Token generation failed", err);
-      }
-      encodeError.hidden = false;
-      encodeResults.hidden = false;
-    }
-  });
 
   const decodeTokenInput = document.getElementById("decode-token");
   const decodeSecretInput = document.getElementById("decode-secret");
@@ -166,6 +110,81 @@ window.addEventListener("load", () => {
     clearDecodeOutputs();
     updateDecodeResetState();
   };
+
+  const copyButtons = Array.from(document.querySelectorAll(".copy-btn"));
+
+  const writeToClipboard = async (text) => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  };
+
+  // START
+  setActiveTab(initialTab, { updateHash: false });
+
+  tabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setActiveTab(button.dataset.tab);
+    });
+  });
+
+  window.addEventListener("hashchange", () => {
+    const hashTab = readHashTab();
+    if (validTabs.has(hashTab)) {
+      setActiveTab(hashTab, { updateHash: false });
+    }
+  });
+
+  encodeSecretInput.addEventListener("input", updateEncodeResetState);
+  encodePayloadInput.addEventListener("input", updateEncodeResetState);
+  encodeResetBtn.addEventListener("click", resetEncodeForm);
+  updateEncodeResetState();
+
+  encodeBtn.addEventListener("click", async () => {
+    encodeError.hidden = true;
+    encodeError.textContent = "";
+    encodeOutput.textContent = "";
+    encodeOutput.classList.remove("visible");
+    encodeOutputBlock.hidden = true;
+    encodeOutputLabel.hidden = true;
+    encodeResults.hidden = true;
+    const secret = encodeSecretInput.value.trim();
+    const payloadText = encodePayloadInput.value.trim();
+    if (!secret) {
+      encodeError.textContent = "Secret is required";
+      encodeError.hidden = false;
+      encodeResults.hidden = false;
+      return;
+    }
+    try {
+      const payload = JSON.parse(payloadText || "{}");
+      const { token } = await createJwt({ payload, secret });
+      encodeOutput.textContent = token;
+      encodeOutput.classList.add("visible");
+      encodeOutputBlock.hidden = false;
+      encodeOutputLabel.hidden = false;
+      encodeResults.hidden = false;
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        encodeError.textContent = "Invalid payload: ensure it is valid JSON";
+      } else {
+        encodeError.textContent = "Error while generating the token";
+        console.error("Token generation failed", err);
+      }
+      encodeError.hidden = false;
+      encodeResults.hidden = false;
+    }
+  });
 
   decodeTokenInput.addEventListener("input", updateDecodeResetState);
   decodeSecretInput.addEventListener("input", updateDecodeResetState);
@@ -225,24 +244,6 @@ window.addEventListener("load", () => {
       return;
     }
   });
-
-  const copyButtons = Array.from(document.querySelectorAll(".copy-btn"));
-
-  const writeToClipboard = async (text) => {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      await navigator.clipboard.writeText(text);
-      return;
-    }
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.style.position = "fixed";
-    textarea.style.opacity = "0";
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    document.execCommand("copy");
-    document.body.removeChild(textarea);
-  };
 
   copyButtons.forEach((button) => {
     const originalLabel = button.textContent;
