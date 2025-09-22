@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>JWT Tool</title>
@@ -38,21 +38,21 @@
             <input
               id="encode-secret"
               type="text"
-              placeholder="Inserisci la secret"
+              placeholder="Enter the secret"
               autocomplete="off"
             />
 
-            <label for="encode-payload">Payload (JSON)</label>
+            <label for="encode-payload">JSON Payload</label>
             <div class="code-editor">
               <pre id="encode-payload-highlight" aria-hidden="true"></pre>
               <textarea
                 id="encode-payload"
                 rows="6"
-                placeholder='{"sub": "1234567890", "name": "Mario Rossi"}'
+                placeholder='{"sub": "1234567890", "name": "John Doe"}'
               ></textarea>
             </div>
 
-            <button id="encode-btn" type="button">Genera token</button>
+            <button id="encode-btn" type="button">Generate token</button>
             <div id="encode-output-block" class="copy-block" hidden>
               <output id="encode-output"></output>
               <button
@@ -60,7 +60,7 @@
                 class="copy-btn"
                 data-copy-target="encode-output"
               >
-                Copia
+                Copy
               </button>
             </div>
             <div id="encode-error" class="error" hidden></div>
@@ -70,22 +70,24 @@
         <section class="tab-panel" data-panel="decode" role="tabpanel" hidden>
           <fieldset>
             <legend>Decode</legend>
-            <label for="decode-token">Token JWT</label>
+            <label for="decode-token">JWT token</label>
             <textarea
               id="decode-token"
               rows="4"
-              placeholder="header.payload.signature"
+              placeholder="Paste the JSON Web Token here"
             ></textarea>
 
-            <label for="decode-secret">Secret (opzionale, per verificare)</label>
+            <label for="decode-secret"
+              >Secret (optional, for verification)</label
+            >
             <input
               id="decode-secret"
               type="text"
-              placeholder="Inserisci la secret"
+              placeholder="Enter the secret"
               autocomplete="off"
             />
 
-            <button id="decode-btn" type="button">Decodifica</button>
+            <button id="decode-btn" type="button">Decode</button>
             <div id="decode-results" class="decode-results" hidden>
               <div class="row two">
                 <div>
@@ -97,7 +99,7 @@
                       class="copy-btn"
                       data-copy-target="decoded-header"
                     >
-                      Copia
+                      Copy
                     </button>
                   </div>
                 </div>
@@ -110,13 +112,13 @@
                       class="copy-btn"
                       data-copy-target="decoded-payload"
                     >
-                      Copia
+                      Copy
                     </button>
                   </div>
                 </div>
               </div>
               <div>
-                <strong>Firma valida?</strong>
+                <strong>Signature valid?</strong>
                 <div id="decoded-valid-block" class="copy-block" hidden>
                   <output id="decoded-valid"></output>
                   <button
@@ -124,7 +126,7 @@
                     class="copy-btn"
                     data-copy-target="decoded-valid"
                   >
-                    Copia
+                    Copy
                   </button>
                 </div>
               </div>
@@ -134,6 +136,7 @@
         </section>
       </div>
     </main>
+    <script src="jwt.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

@@ -100,6 +100,15 @@ button {
 .row.two {
   grid-template-columns: 1fr 1fr;
 }
+.decode-results {
+  border-top: 1px dashed #7774;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+.decode-results strong {
+  display: block;
+  margin-bottom: 0.75rem;
+}
 pre,
 output {
   display: none;

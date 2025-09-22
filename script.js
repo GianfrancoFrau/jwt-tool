@@ -1,6 +1,10 @@
 window.addEventListener("load", () => {
-  const textEncoder = new TextEncoder();
-  const textDecoder = new TextDecoder();
+  if (!window.jwt) {
+    console.error("JWT module failed to load");
+    return;
+  }
+
+  const { createJwt, parseJwt, verifyJwtSignature, errors: jwtErrors } = window.jwt;
 
   const tabButtons = Array.from(document.querySelectorAll(".tab-btn"));
   const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
@@ -52,66 +56,6 @@ window.addEventListener("load", () => {
     }
   });
 
-  const toBase64Url = (input) => {
-    const bytes = typeof input === "string" ? textEncoder.encode(input) : new Uint8Array(input);
-    let binary = "";
-    for (let i = 0; i < bytes.length; i += 1) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  };
-
-  const fromBase64Url = (input) => {
-    const padded = input.replace(/-/g, "+").replace(/_/g, "/");
-    const padLength = (4 - (padded.length % 4)) % 4;
-    const base64 = padded + "=".repeat(padLength);
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i += 1) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return textDecoder.decode(bytes);
-  };
-
-  const base64UrlToUint8Array = (input) => {
-    const padded = input.replace(/-/g, "+").replace(/_/g, "/");
-    const padLength = (4 - (padded.length % 4)) % 4;
-    const base64 = padded + "=".repeat(padLength);
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i += 1) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes;
-  };
-
-  const importHmacKey = async (secret) => {
-    return crypto.subtle.importKey(
-      "raw",
-      textEncoder.encode(secret),
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["sign", "verify"]
-    );
-  };
-
-  const sign = async (secret, data) => {
-    const key = await importHmacKey(secret);
-    const signature = await crypto.subtle.sign("HMAC", key, textEncoder.encode(data));
-    return toBase64Url(signature);
-  };
-
-  const verify = async (secret, data, signatureB64) => {
-    try {
-      const key = await importHmacKey(secret);
-      const signatureBytes = base64UrlToUint8Array(signatureB64);
-      return crypto.subtle.verify("HMAC", key, signatureBytes, textEncoder.encode(data));
-    } catch (err) {
-      console.error("Verifica firma fallita", err);
-      return false;
-    }
-  };
-
   const encodeSecretInput = document.getElementById("encode-secret");
   const encodePayloadInput = document.getElementById("encode-payload");
   const encodeBtn = document.getElementById("encode-btn");
@@ -128,22 +72,23 @@ window.addEventListener("load", () => {
     const secret = encodeSecretInput.value.trim();
     const payloadText = encodePayloadInput.value.trim();
     if (!secret) {
-      encodeError.textContent = "La secret è obbligatoria";
+      encodeError.textContent = "Secret is required";
       encodeError.hidden = false;
       return;
     }
     try {
       const payload = JSON.parse(payloadText || "{}");
-      const header = { alg: "HS256", typ: "JWT" };
-      const encodedHeader = toBase64Url(JSON.stringify(header));
-      const encodedPayload = toBase64Url(JSON.stringify(payload));
-      const signingInput = `${encodedHeader}.${encodedPayload}`;
-      const signature = await sign(secret, signingInput);
-      encodeOutput.textContent = `${signingInput}.${signature}`;
+      const { token } = await createJwt({ payload, secret });
+      encodeOutput.textContent = token;
       encodeOutput.classList.add("visible");
       encodeOutputBlock.hidden = false;
     } catch (err) {
-      encodeError.textContent = "Payload non valido: assicurati che sia JSON";
+      if (err instanceof SyntaxError) {
+        encodeError.textContent = "Invalid payload: ensure it is valid JSON";
+      } else {
+        encodeError.textContent = "Error while generating the token";
+        console.error("Token generation failed", err);
+      }
       encodeError.hidden = false;
     }
   });
@@ -180,41 +125,50 @@ window.addEventListener("load", () => {
 
     const token = decodeTokenInput.value.trim();
     if (!token) {
-      decodeError.textContent = "Inserisci un token JWT";
+      decodeError.textContent = "Enter a JWT token";
       decodeError.hidden = false;
       return;
     }
-    const parts = token.split(".");
-    if (parts.length !== 3) {
-      decodeError.textContent = "Formato token non valido";
-      decodeError.hidden = false;
-      return;
-    }
-    const [headerPart, payloadPart, signaturePart] = parts;
     try {
-      decodedHeader.textContent = JSON.stringify(JSON.parse(fromBase64Url(headerPart)), null, 2);
+      const parsed = parseJwt(token);
+      decodedHeader.textContent = JSON.stringify(parsed.header, null, 2);
       decodedHeader.classList.add("visible");
       decodedHeaderBlock.hidden = false;
-      decodedPayload.textContent = JSON.stringify(JSON.parse(fromBase64Url(payloadPart)), null, 2);
+      decodedPayload.textContent = JSON.stringify(parsed.payload, null, 2);
       decodedPayload.classList.add("visible");
       decodedPayloadBlock.hidden = false;
       decodeResults.hidden = false;
+      const secret = decodeSecretInput.value.trim();
+      if (secret) {
+        const isValid = await verifyJwtSignature({
+          secret,
+          headerPart: parsed.headerPart,
+          payloadPart: parsed.payloadPart,
+          signature: parsed.signature,
+        });
+        decodedValid.textContent = isValid ? "Yes" : "No";
+        decodedValid.classList.add("visible");
+        decodedValidBlock.hidden = false;
+      } else {
+        decodedValid.textContent = "Secret not provided";
+        decodedValid.classList.add("visible");
+        decodedValidBlock.hidden = false;
+      }
     } catch (err) {
-      decodeError.textContent = "Impossibile decodificare header o payload";
+      if (err instanceof SyntaxError) {
+        decodeError.textContent = "Unable to decode header or payload";
+      } else if (err?.name === "JwtError") {
+        if (err.code === jwtErrors.InvalidFormat) {
+          decodeError.textContent = "Invalid token format";
+        } else {
+          decodeError.textContent = err.message;
+        }
+      } else {
+        decodeError.textContent = "Unable to decode header or payload";
+        console.error("Token decoding failed", err);
+      }
       decodeError.hidden = false;
       return;
-    }
-    const secret = decodeSecretInput.value.trim();
-    if (secret) {
-      const signingInput = `${headerPart}.${payloadPart}`;
-      const isValid = await verify(secret, signingInput, signaturePart);
-      decodedValid.textContent = isValid ? "Sì" : "No";
-      decodedValid.classList.add("visible");
-      decodedValidBlock.hidden = false;
-    } else {
-      decodedValid.textContent = "Secret non fornita";
-      decodedValid.classList.add("visible");
-      decodedValidBlock.hidden = false;
     }
   });
 
@@ -251,10 +205,10 @@ window.addEventListener("load", () => {
       button.disabled = true;
       try {
         await writeToClipboard(text);
-        button.textContent = "Copiato!";
+        button.textContent = "Copied!";
       } catch (err) {
-        console.error("Copia negli appunti fallita", err);
-        button.textContent = "Errore";
+        console.error("Copy to clipboard failed", err);
+        button.textContent = "Error";
       }
       setTimeout(() => {
         button.textContent = originalLabel;
