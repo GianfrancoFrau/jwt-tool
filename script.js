@@ -63,6 +63,7 @@ window.addEventListener("load", () => {
   const encodeResults = document.getElementById("encode-results");
   const encodeOutput = document.getElementById("encode-output");
   const encodeOutputBlock = document.getElementById("encode-output-block");
+  const encodeOutputLabel = document.getElementById("encode-output-label");
   const encodeError = document.getElementById("encode-error");
 
   const updateEncodeResetState = () => {
@@ -79,6 +80,7 @@ window.addEventListener("load", () => {
     encodeOutput.textContent = "";
     encodeOutput.classList.remove("visible");
     encodeOutputBlock.hidden = true;
+    encodeOutputLabel.hidden = true;
     encodeResults.hidden = true;
     updateEncodeResetState();
   };
@@ -94,6 +96,7 @@ window.addEventListener("load", () => {
     encodeOutput.textContent = "";
     encodeOutput.classList.remove("visible");
     encodeOutputBlock.hidden = true;
+    encodeOutputLabel.hidden = true;
     encodeResults.hidden = true;
     const secret = encodeSecretInput.value.trim();
     const payloadText = encodePayloadInput.value.trim();
@@ -109,6 +112,7 @@ window.addEventListener("load", () => {
       encodeOutput.textContent = token;
       encodeOutput.classList.add("visible");
       encodeOutputBlock.hidden = false;
+      encodeOutputLabel.hidden = false;
       encodeResults.hidden = false;
     } catch (err) {
       if (err instanceof SyntaxError) {
