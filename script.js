@@ -4,21 +4,52 @@ window.addEventListener("load", () => {
 
   const tabButtons = Array.from(document.querySelectorAll(".tab-btn"));
   const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
+  const validTabs = new Set(tabButtons.map((button) => button.dataset.tab));
+
+  const applyTabState = (target) => {
+    tabButtons.forEach((button) => {
+      const isActive = button.dataset.tab === target;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-selected", String(isActive));
+    });
+    tabPanels.forEach((panel) => {
+      const show = panel.dataset.panel === target;
+      panel.classList.toggle("active", show);
+      panel.toggleAttribute("hidden", !show);
+    });
+  };
+
+  const setActiveTab = (target, { updateHash = true } = {}) => {
+    if (!validTabs.has(target)) {
+      return;
+    }
+    applyTabState(target);
+    if (updateHash) {
+      const newHash = `#${target}`;
+      if (window.location.hash !== newHash) {
+        history.replaceState(null, "", newHash);
+      }
+    }
+  };
+
+  const readHashTab = () => window.location.hash.slice(1).toLowerCase();
+
+  const defaultTab = tabButtons[0]?.dataset.tab ?? "encode";
+  const initialHashTab = readHashTab();
+  const initialTab = validTabs.has(initialHashTab) ? initialHashTab : defaultTab;
+  setActiveTab(initialTab, { updateHash: false });
 
   tabButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      const target = button.dataset.tab;
-      tabButtons.forEach((other) => {
-        const isActive = other === button;
-        other.classList.toggle("active", isActive);
-        other.setAttribute("aria-selected", String(isActive));
-      });
-      tabPanels.forEach((panel) => {
-        const show = panel.dataset.panel === target;
-        panel.classList.toggle("active", show);
-        panel.toggleAttribute("hidden", !show);
-      });
+      setActiveTab(button.dataset.tab);
     });
+  });
+
+  window.addEventListener("hashchange", () => {
+    const hashTab = readHashTab();
+    if (validTabs.has(hashTab)) {
+      setActiveTab(hashTab, { updateHash: false });
+    }
   });
 
   const toBase64Url = (input) => {
