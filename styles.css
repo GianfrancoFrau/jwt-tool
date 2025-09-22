@@ -6,10 +6,12 @@
 body {
   min-height: 100vh;
   margin: 0;
-  padding: 0 1.5rem;
+  padding: 1.5rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1.5rem;
 }
 .app {
   width: min(100%, 720px);
@@ -171,4 +173,17 @@ output.visible {
   color: #d93025;
   font-weight: 600;
   margin-top: 0.5rem;
+}
+
+.site-footer {
+  width: min(100%, 720px);
+  text-align: center;
+  font-size: 0.9rem;
+  color: inherit;
+}
+
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: 600;
 }
