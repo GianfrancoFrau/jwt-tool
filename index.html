@@ -98,42 +98,40 @@
               <button id="decode-btn" type="button">Decode</button>
             </div>
             <div id="decode-results" class="decode-results" hidden>
-              <div class="row two">
-                <div>
-                  <strong>Header</strong>
-                  <div id="decoded-header-block" class="copy-block" hidden>
-                    <pre id="decoded-header"></pre>
-                    <button
-                      type="button"
-                      class="copy-btn"
-                      data-copy-target="decoded-header"
-                    >
-                      Copy
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <strong>Payload</strong>
-                  <div id="decoded-payload-block" class="copy-block" hidden>
-                    <pre id="decoded-payload"></pre>
-                    <button
-                      type="button"
-                      class="copy-btn"
-                      data-copy-target="decoded-payload"
-                    >
-                      Copy
-                    </button>
-                  </div>
+              <div>
+                <strong>Header</strong>
+                <div id="decoded-header-block" class="copy-block" hidden>
+                  <pre id="decoded-header"></pre>
+                  <button
+                    type="button"
+                    class="copy-btn"
+                    data-copy-target="decoded-header"
+                  >
+                    Copy
+                  </button>
                 </div>
               </div>
               <div>
-                <strong>Signature valid?</strong>
+                <strong>Secret valid?</strong>
                 <div id="decoded-valid-block" class="copy-block" hidden>
                   <output id="decoded-valid"></output>
                   <button
                     type="button"
                     class="copy-btn"
                     data-copy-target="decoded-valid"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+              <div>
+                <strong>JSON Payload</strong>
+                <div id="decoded-payload-block" class="copy-block" hidden>
+                  <pre id="decoded-payload"></pre>
+                  <button
+                    type="button"
+                    class="copy-btn"
+                    data-copy-target="decoded-payload"
                   >
                     Copy
                   </button>
