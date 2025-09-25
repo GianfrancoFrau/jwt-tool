@@ -70,6 +70,16 @@ output,
 pre {
   margin-bottom: 0.75rem;
 }
+.code-editor {
+  position: relative;
+}
+.code-editor textarea {
+  margin-bottom: 0;
+  padding-right: 5rem;
+}
+.code-editor pre {
+  margin-bottom: 0;
+}
 .copy-block {
   position: relative;
   margin-bottom: 0.75rem;

@@ -50,7 +50,16 @@
                 rows="6"
                 placeholder='{"sub": "1234567890", "name": "John Doe"}'
               ></textarea>
+              <button
+                type="button"
+                id="encode-beautify-btn"
+                class="copy-btn"
+                disabled
+              >
+                Beautify
+              </button>
             </div>
+            <div id="encode-payload-error" class="error" hidden></div>
 
             <div class="button-row">
               <button id="encode-reset-btn" type="button" disabled>Reset</button>

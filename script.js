@@ -50,11 +50,42 @@ window.addEventListener("load", () => {
   const encodeOutputBlock = document.getElementById("encode-output-block");
   const encodeOutputLabel = document.getElementById("encode-output-label");
   const encodeError = document.getElementById("encode-error");
+  const encodeBeautifyBtn = document.getElementById("encode-beautify-btn");
+  const encodePayloadError = document.getElementById("encode-payload-error");
 
   const updateEncodeResetState = () => {
     const hasSecret = encodeSecretInput.value.trim().length > 0;
     const hasPayload = encodePayloadInput.value.trim().length > 0;
     encodeResetBtn.disabled = !(hasSecret || hasPayload);
+  };
+
+  const setEncodePayloadError = (message = "") => {
+    if (!message) {
+      encodePayloadError.textContent = "";
+      encodePayloadError.hidden = true;
+      return;
+    }
+    encodePayloadError.textContent = message;
+    encodePayloadError.hidden = false;
+  };
+
+  const validateEncodePayload = () => {
+    const payloadText = encodePayloadInput.value.trim();
+    if (!payloadText) {
+      encodeBeautifyBtn.disabled = true;
+      setEncodePayloadError();
+      return { valid: false, value: null };
+    }
+    try {
+      const parsed = JSON.parse(payloadText);
+      encodeBeautifyBtn.disabled = false;
+      setEncodePayloadError();
+      return { valid: true, value: parsed };
+    } catch (err) {
+      encodeBeautifyBtn.disabled = true;
+      setEncodePayloadError("Invalid JSON");
+      return { valid: false, value: null };
+    }
   };
 
   const resetEncodeForm = () => {
@@ -67,6 +98,8 @@ window.addEventListener("load", () => {
     encodeOutputBlock.hidden = true;
     encodeOutputLabel.hidden = true;
     encodeResults.hidden = true;
+    encodeBeautifyBtn.disabled = true;
+    setEncodePayloadError();
     updateEncodeResetState();
   };
 
@@ -146,9 +179,33 @@ window.addEventListener("load", () => {
   });
 
   encodeSecretInput.addEventListener("input", updateEncodeResetState);
-  encodePayloadInput.addEventListener("input", updateEncodeResetState);
+  encodePayloadInput.addEventListener("input", () => {
+    updateEncodeResetState();
+    validateEncodePayload();
+  });
   encodeResetBtn.addEventListener("click", resetEncodeForm);
   updateEncodeResetState();
+  validateEncodePayload();
+
+  encodeBeautifyBtn.addEventListener("click", () => {
+    const payloadText = encodePayloadInput.value.trim();
+    if (!payloadText) {
+      encodeBeautifyBtn.disabled = true;
+      return;
+    }
+    try {
+      const parsed = JSON.parse(payloadText);
+      const beautified = JSON.stringify(parsed, null, 2);
+      encodePayloadInput.value = beautified;
+      setEncodePayloadError();
+      encodeBeautifyBtn.disabled = false;
+      updateEncodeResetState();
+      validateEncodePayload();
+    } catch (err) {
+      setEncodePayloadError("invalid JSON");
+      encodeBeautifyBtn.disabled = true;
+    }
+  });
 
   encodeBtn.addEventListener("click", async () => {
     encodeError.hidden = true;
